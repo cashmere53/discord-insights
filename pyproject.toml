@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "discord_bot"
-version = "0.1.0"
+name = "discord-insights"
+version = "0.1.1"
 description = ""
 authors = ["Your Name <you@example.com>"]
 
