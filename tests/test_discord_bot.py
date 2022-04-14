@@ -1,5 +1,5 @@
-from discord_insights import __version__
+from dinsights import __version__
 
 
 def test_version():
-    assert __version__ == '0.1.0'
+    assert __version__ == '0.1.2'

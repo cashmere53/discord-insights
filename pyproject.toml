@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "discord-insights"
-version = "0.1.1"
+name = "dinsights"
+version = "0.1.2"
 description = "member activity watcher in Discord"
 authors = ["cashmere53 <15913755+cashmere53@users.noreply.github.com>"]
 

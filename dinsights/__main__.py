@@ -2,8 +2,8 @@
 
 from discord import Intents
 
-from discord_insights.client import InsightsClient
-from discord_insights.load_token import TOKEN
+from dinsights.client import InsightsClient
+from dinsights.load_token import TOKEN
 
 
 def run_client() -> None:
@@ -14,7 +14,7 @@ def run_client() -> None:
     intents.guilds = True
     intents.voice_states = True
 
-    client: InsightsClient = InsightsClient(intents=intents)
+    client: InsightsClient = InsightsClient(intents=intents, talk_channel="discord-insights")
 
     client.run(TOKEN)
 

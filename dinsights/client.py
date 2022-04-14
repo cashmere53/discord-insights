@@ -37,8 +37,9 @@ def _find_channel(member: Member, channel_name: str = "bot_dev") -> Optional[Tex
 
 
 class InsightsClient(Client):
-    def __init__(self, *, intents: Intents):
+    def __init__(self, *, intents: Intents, talk_channel: str):
         super().__init__(intents=intents)
+        self.talk_channel = talk_channel
 
     async def on_ready(self) -> None:
         logger.info("we have logged in as {0.user}".format(self))
@@ -60,7 +61,7 @@ class InsightsClient(Client):
         logger.info(repr(before))
         logger.info(repr(after))
 
-        talk_channel: TextChannel = _find_channel(after)
+        talk_channel: TextChannel = _find_channel(after, self.talk_channel)
 
         await self.check_change_status(after.display_name, before.status, after.status, talk_channel)
         await self.check_change_activity(after.display_name, before.activity, after.activity, talk_channel)
@@ -75,7 +76,7 @@ class InsightsClient(Client):
         if before == after:
             return
 
-        message: str = f"{name} is changing status. {before} -> {after}"
+        message: str = f"{name} is change status. {before} -> {after}"
 
         logger.info(message)
         if talk_channel is not None:
@@ -110,7 +111,7 @@ class InsightsClient(Client):
         if after is not None:
             after_activity_name = after.name
 
-        message: str = f"{name} is changing activities. {before_activity_name} -> {after_activity_name}"
+        message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
 
         logger.info(message)
         if talk_channel is not None:
@@ -121,7 +122,7 @@ class InsightsClient(Client):
         logger.debug(f"{before=}")
         logger.debug(f"{after=}")
 
-        talk_channel: TextChannel = _find_channel(member)
+        talk_channel: TextChannel = _find_channel(member, self.talk_channel)
 
         await self.check_change_voice_status(member.display_name, before, after, talk_channel)
 
