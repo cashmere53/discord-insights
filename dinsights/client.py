@@ -22,7 +22,7 @@ from discord.abc import GuildChannel
 from loguru import logger
 
 
-def _find_channel(member: Member, channel_name: str = "bot_dev") -> Optional[TextChannel]:
+def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
     member_guild: Guild = member.guild
     guild_channel: list[GuildChannel] = member_guild.channels
     talk_channel: Optional[TextChannel] = None
@@ -34,6 +34,10 @@ def _find_channel(member: Member, channel_name: str = "bot_dev") -> Optional[Tex
             break
 
     return talk_channel
+
+
+def _is_joining_in_voice_channel(member: Member) -> bool:
+    return member.voice is not None
 
 
 class InsightsClient(Client):
@@ -60,6 +64,9 @@ class InsightsClient(Client):
         logger.info("someone presences is updated.")
         logger.info(repr(before))
         logger.info(repr(after))
+
+        if not _is_joining_in_voice_channel(after):
+            return
 
         talk_channel: TextChannel = _find_channel(after, self.talk_channel)
 
