@@ -1,15 +1,15 @@
 {
     "editor.formatOnSave": true,
-    "python.formatting.blackPath": ".venv\\Scripts\\black",
+    "python.formatting.blackPath": "{$workspaceFolder}/.venv/Scripts/black.exe",
     "python.formatting.provider": "black",
     "python.formatting.blackArgs": [],
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
     "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": ".venv\\Scripts\\pflake8",
+    "python.linting.flake8Path": "{$workspaceFolder}/.venv/Scripts/pflake8.exe",
     "python.linting.flake8Args": [],
     "python.linting.mypyEnabled": true,
-    "python.linting.mypyPath": ".venv\\Scripts\\mypy",
+    "python.linting.mypyPath": "{$workspaceFolder}/.venv/Scripts/mypy.exe",
     "python.linting.mypyArgs": [],
     "editor.codeActionsOnSave": {
         "source.organizeImports": true,
