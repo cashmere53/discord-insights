@@ -14,7 +14,7 @@ def run_client() -> None:
     intents.guilds = True
     intents.voice_states = True
 
-    client: InsightsClient = InsightsClient(intents=intents, talk_channel="discord-insights")
+    client: InsightsClient = InsightsClient(intents=intents, talk_channel="game-activities")
 
     client.run(TOKEN)
 
