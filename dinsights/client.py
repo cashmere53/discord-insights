@@ -124,6 +124,9 @@ class InsightsClient(Client):
         logger.debug(f"{before=}")
         logger.debug(f"{after=}")
 
+        if isinstance(before, Spotify) or isinstance(after, Spotify):
+            return
+
         before_activity_name: str = "None"
         if before is not None:
             before_activity_name = before.name
