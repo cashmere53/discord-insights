@@ -25,10 +25,12 @@ from loguru import logger
 def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
     member_guild: Guild = member.guild
     guild_channel: list[GuildChannel] = member_guild.channels
+    talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
+ 
+    logger.debug(f"{talk_channels=}")
+ 
     talk_channel: Optional[TextChannel] = None
-
-    logger.debug(f"{guild_channel=}")
-    for channel in guild_channel:
+    for channel in talk_channels:
         if str(channel) == channel_name:
             talk_channel = channel
             break
@@ -38,6 +40,19 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
 
 def _is_joining_in_voice_channel(member: Member) -> bool:
     return member.voice is not None
+
+
+async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: str) -> None:
+    if talk_channel is None:
+        return
+    if len(message) == 0:
+        return 
+
+    message: str = f'"{message}"'
+    guild: Guild = talk_channel.guild
+    
+    logger.info(f"tweets to {message} to {talk_channel.name} at {guild.name}")
+    await talk_channel.send(message)
 
 
 class InsightsClient(Client):
@@ -68,7 +83,7 @@ class InsightsClient(Client):
         if not _is_joining_in_voice_channel(after):
             return
 
-        talk_channel: TextChannel = _find_channel(after, self.talk_channel)
+        talk_channel: Optional[TextChannel] = _find_channel(after, self.talk_channel)
 
         await self.check_change_status(after.display_name, before.status, after.status, talk_channel)
         await self.check_change_activity(after.display_name, before.activity, after.activity, talk_channel)
@@ -86,8 +101,7 @@ class InsightsClient(Client):
         message: str = f"{name} is change status. {before} -> {after}"
 
         logger.info(message)
-        if talk_channel is not None:
-            await talk_channel.send(message)
+        await _tweet_to_talk_channel(talk_channel, message)
 
     async def check_change_activity(
         self,
@@ -120,9 +134,7 @@ class InsightsClient(Client):
 
         message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
 
-        logger.info(message)
-        if talk_channel is not None:
-            await talk_channel.send(message)
+        await _tweet_to_talk_channel(talk_channel, message)
 
     async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState) -> None:
         logger.debug(f"{member=}")
@@ -151,7 +163,4 @@ class InsightsClient(Client):
         if before_channel is not None and after_channel is None:
             message = f"{name} lefts Voice Channel at {before_channel.name}"
 
-        if message != "":
-            logger.info(message)
-        if talk_channel is not None:
-            await talk_channel.send(message)
+        await _tweet_to_talk_channel(talk_channel, message)
