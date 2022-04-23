@@ -5,8 +5,11 @@ from __future__ import annotations
 from typing import Optional
 
 from discord import (
+    Activity,
     BaseActivity,
     Client,
+    CustomActivity,
+    Game,
     Guild,
     Intents,
     Member,
@@ -14,6 +17,7 @@ from discord import (
     Spotify,
     StageChannel,
     Status,
+    Streaming,
     TextChannel,
     VoiceChannel,
     VoiceState,
@@ -124,13 +128,16 @@ class InsightsClient(Client):
         logger.debug(f"{before=}")
         logger.debug(f"{after=}")
 
+        if isinstance(before, Spotify) or isinstance(after, Spotify):
+            return
+
         before_activity_name: str = "None"
-        if before is not None:
-            before_activity_name = before.name
+        if (before is not None) and isinstance(before, (Activity, Game, Streaming, CustomActivity)) and (name := before.name) is not None:
+            before_activity_name = name
 
         after_activity_name: str = "None"
-        if after is not None:
-            after_activity_name = after.name
+        if (after is not None) and isinstance(after, (Activity, Game, Streaming, CustomActivity)) and (name := after.name) is not None:
+            after_activity_name = name
 
         message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
 
