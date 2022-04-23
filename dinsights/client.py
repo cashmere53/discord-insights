@@ -6,6 +6,7 @@ from typing import Optional
 
 from discord import (
     Activity,
+    ActivityType,
     BaseActivity,
     Client,
     CustomActivity,
@@ -30,15 +31,14 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
     member_guild: Guild = member.guild
     guild_channel: list[GuildChannel] = member_guild.channels
     talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
- 
-    logger.debug(f"{talk_channels=}")
- 
+
     talk_channel: Optional[TextChannel] = None
     for channel in talk_channels:
         if str(channel) == channel_name:
             talk_channel = channel
             break
 
+    logger.debug(f"{talk_channel=}")
     return talk_channel
 
 
@@ -50,22 +50,33 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: s
     if talk_channel is None:
         return
     if len(message) == 0:
-        return 
+        return
 
     message: str = f'"{message}"'
     guild: Guild = talk_channel.guild
-    
+
     logger.info(f"tweets to {message} to {talk_channel.name} at {guild.name}")
     await talk_channel.send(message)
 
 
 class InsightsClient(Client):
-    def __init__(self, *, intents: Intents, talk_channel: str):
+    def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False):
         super().__init__(intents=intents)
-        self.talk_channel = talk_channel
+        self.talk_channel: str = talk_channel
+        self.dev_mode: bool = dev_mode
 
     async def on_ready(self) -> None:
         logger.info("we have logged in as {0.user}".format(self))
+
+        if self.dev_mode:
+            logger.info("Launch in development mode")
+            dev_activity: Activity = Activity(
+                name="Develop Mode",
+                type=ActivityType.playing,
+                state="In dev mode",
+                details="launch in development mode",
+            )
+            await self.change_presence(activity=dev_activity)
 
     async def on_message(self, message: Message) -> None:
         logger.debug(f"{message}, type={type(message)}")
@@ -132,12 +143,20 @@ class InsightsClient(Client):
             return
 
         before_activity_name: str = "None"
-        if (before is not None) and isinstance(before, (Activity, Game, Streaming, CustomActivity)) and (name := before.name) is not None:
-            before_activity_name = name
+        if (
+            before is not None
+            and isinstance(before, (Activity, Game, Streaming, CustomActivity))
+            and (act_name := before.name) is not None
+        ):
+            before_activity_name = act_name
 
         after_activity_name: str = "None"
-        if (after is not None) and isinstance(after, (Activity, Game, Streaming, CustomActivity)) and (name := after.name) is not None:
-            after_activity_name = name
+        if (
+            after is not None
+            and isinstance(after, (Activity, Game, Streaming, CustomActivity))
+            and (act_name := after.name) is not None
+        ):
+            after_activity_name = act_name
 
         message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
 
