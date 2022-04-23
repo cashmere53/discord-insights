@@ -2,7 +2,9 @@ version: '3'
 
 services:
     dinsights:
-        image: dinsights:v0.1.5
+        build: .
         restart: always
         environment:
             - TZ=Asia/Tokyo
+            # - DEVMODE=true
+            # - TALK_CHANNEL=dev-bot
