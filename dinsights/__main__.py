@@ -2,6 +2,7 @@
 
 from discord import Intents
 
+from dinsights import __version__
 from dinsights.client import InsightsClient
 from dinsights.configs import configs
 from dinsights.load_token import TOKEN
@@ -19,6 +20,7 @@ def run_client() -> None:
         intents=intents,
         talk_channel=configs.talk_channel,
         dev_mode=configs.devmode,
+        version=__version__,
     )
 
     client.run(TOKEN)
