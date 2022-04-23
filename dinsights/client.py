@@ -30,9 +30,9 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
     member_guild: Guild = member.guild
     guild_channel: list[GuildChannel] = member_guild.channels
     talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
- 
+
     logger.debug(f"{talk_channels=}")
- 
+
     talk_channel: Optional[TextChannel] = None
     for channel in talk_channels:
         if str(channel) == channel_name:
@@ -50,12 +50,11 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: s
     if talk_channel is None:
         return
     if len(message) == 0:
-        return 
+        return
 
-    message: str = f'"{message}"'
     guild: Guild = talk_channel.guild
-    
-    logger.info(f"tweets to {message} to {talk_channel.name} at {guild.name}")
+
+    logger.info(f'tweets to "{message}" to {talk_channel.name} at {guild.name}')
     await talk_channel.send(message)
 
 
@@ -133,11 +132,19 @@ class InsightsClient(Client):
             return
 
         before_activity_name: str = "None"
-        if (before is not None) and isinstance(before, (Activity, Game, Streaming, CustomActivity)) and (name := before.name) is not None:
+        if (
+            (before is not None)
+            and isinstance(before, (Activity, Game, Streaming, CustomActivity))
+            and (name := before.name) is not None
+        ):
             before_activity_name = name
 
         after_activity_name: str = "None"
-        if (after is not None) and isinstance(after, (Activity, Game, Streaming, CustomActivity)) and (name := after.name) is not None:
+        if (
+            (after is not None)
+            and isinstance(after, (Activity, Game, Streaming, CustomActivity))
+            and (name := after.name) is not None
+        ):
             after_activity_name = name
 
         message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
