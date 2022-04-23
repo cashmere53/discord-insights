@@ -28,6 +28,16 @@ from loguru import logger
 
 
 def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
+    """メンバーインスタンスから指定したチャンネル名のインスタンスを取得する
+
+    Args:
+        member (Member): メンバーインスタンス
+        channel_name (str): 取得したいTextChannelインスタンスのチャンネル名
+
+    Returns:
+        Optional[TextChannel]: 指定したチャンネル名のインスタンス
+        見つからない場合はNoneを返す
+    """
     member_guild: Guild = member.guild
     guild_channel: list[GuildChannel] = member_guild.channels
     talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
@@ -43,10 +53,24 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
 
 
 def _is_joining_in_voice_channel(member: Member) -> bool:
+    """メンバーがボイスチャンネルに参加しているか
+
+    Args:
+        member (Member): ボイスチャンネルに参加しているか確認するメンバーインスタンス
+
+    Returns:
+        bool: True=ボイスチャンネルに参加している、False=参加していない
+    """
     return member.voice is not None
 
 
 async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: str) -> None:
+    """指定したTextChannelにメッセージを送信する
+
+    Args:
+        talk_channel (Optional[TextChannel]): 送信したいTextChannelインスタンス
+        message (str): 送信するメッセージ
+    """
     if talk_channel is None:
         return
     if len(message) == 0:
@@ -58,7 +82,15 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: s
     await talk_channel.send(message)
 
 
-def _extract_name_from_activity(activity: BaseActivity) -> str:
+def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
+    """BaseActivityインスタンスからアクティビティ名を取得する
+
+    Args:
+        activity (Optional[BaseActivity]): アクティビティ名を取得したいBaseActivityインスタンス
+
+    Returns:
+        str: アクティビティ名
+    """
     activity_name: str = "None"
     if (
         activity is not None
@@ -104,8 +136,8 @@ class InsightsClient(Client):
 
     async def on_member_update(self, before: Member, after: Member) -> None:
         logger.info("someone presences is updated.")
-        logger.info(repr(before))
-        logger.info(repr(after))
+        logger.debug(repr(before))
+        logger.debug(repr(after))
 
         if not _is_joining_in_voice_channel(after):
             return

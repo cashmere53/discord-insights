@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+    dinsights:
+        build: .
+        restart: always
+        environment:
+            - TZ=Asia/Tokyo
+            # - DEVMODE=true
+            # - TALK_CHANNEL=dev-bot
