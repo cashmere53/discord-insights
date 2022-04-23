@@ -103,7 +103,7 @@ def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
     return activity_name
 
 class InsightsClient(Client):
-    def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False, version: str):
+    def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False, version: str) -> None:
         super().__init__(intents=intents)
         self.talk_channel: str = talk_channel
         self.dev_mode: bool = dev_mode
