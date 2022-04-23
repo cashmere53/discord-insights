@@ -60,12 +60,13 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: s
 
 
 class InsightsClient(Client):
-    def __init__(self, *, intents: Intents, talk_channel: str):
+    def __init__(self, *, intents: Intents, talk_channel: str, version: str):
         super().__init__(intents=intents)
         self.talk_channel = talk_channel
+        self.version = version
 
     async def on_ready(self) -> None:
-        logger.info("we have logged in as {0.user}".format(self))
+        logger.info(f"we have logged in as {self.user}. version={self.version}")
 
     async def on_message(self, message: Message) -> None:
         logger.debug(f"{message}, type={type(message)}")
