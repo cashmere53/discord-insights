@@ -64,7 +64,7 @@ def _is_joining_in_voice_channel(member: Member) -> bool:
     return member.voice is not None
 
 
-async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: str) -> None:
+async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: Optional[str]) -> None:
     """指定したTextChannelにメッセージを送信する
 
     Args:
@@ -72,6 +72,8 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: s
         message (str): 送信するメッセージ
     """
     if talk_channel is None:
+        return
+    if message is None:
         return
     if len(message) == 0:
         return
@@ -101,6 +103,64 @@ def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
         activity_name = act_name
 
     return activity_name
+
+
+def _check_change_status(name: str, before: Status, after: Status) -> Optional[str]:
+    """前後のメンバーステータスから変更をチェックする
+
+    Args:
+        name (str): チェックするメンバーの名前
+        before (Status): 変更前ステータス
+        after (Status): 変更後ステータス
+
+    Returns:
+        Optional[str]: 変更メッセージ Noneは変更なし
+    """
+    if before == after:
+        return
+
+    message: str = f"{name} is change status. {before} -> {after}"
+
+    logger.info(message)
+    return message
+
+
+def _check_change_activity(
+    name: str, before: Optional[BaseActivity | Spotify], after: Optional[BaseActivity | Spotify]
+) -> Optional[str]:
+    """前後のメンバーアクティビティから変更をチェックする
+
+    Args:
+        name (str): チェックするメンバーの名前
+        before (Optional[BaseActivity  |  Spotify]): 変更前のアクティビティ
+        after (Optional[BaseActivity  |  Spotify]): 変更後のアクティビティ
+
+    Returns:
+        Optional[str]: 変更メッセージ Noneは変更なし
+    """
+    if before == after:
+        return
+    if (
+        before is not None
+        and after is not None
+        and before.name is not None
+        and after.name is not None
+        and before.name == after.name
+    ):
+        return
+
+    logger.debug(f"{before=}")
+    logger.debug(f"{after=}")
+
+    if isinstance(before, Spotify) or isinstance(after, Spotify):
+        return
+
+    before_activity_name: str = _extract_name_from_activity(before)
+    after_activity_name: str = _extract_name_from_activity(after)
+
+    message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
+    return message
+
 
 class InsightsClient(Client):
     def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False, version: str) -> None:
@@ -144,54 +204,12 @@ class InsightsClient(Client):
 
         talk_channel: Optional[TextChannel] = _find_channel(after, self.talk_channel)
 
-        await self.check_change_status(after.display_name, before.status, after.status, talk_channel)
-        await self.check_change_activity(after.display_name, before.activity, after.activity, talk_channel)
+        message: list[Optional[str]] = [
+            _check_change_status(after.display_name, before.status, after.status),
+            _check_change_activity(after.display_name, before.activity, after.activity),
+        ]
 
-    async def check_change_status(
-        self,
-        name: str,
-        before: Status,
-        after: Status,
-        talk_channel: Optional[TextChannel],
-    ) -> None:
-        if before == after:
-            return
-
-        message: str = f"{name} is change status. {before} -> {after}"
-
-        logger.info(message)
-        await _tweet_to_talk_channel(talk_channel, message)
-
-    async def check_change_activity(
-        self,
-        name: str,
-        before: Optional[BaseActivity | Spotify],
-        after: Optional[BaseActivity | Spotify],
-        talk_channel: Optional[TextChannel],
-    ) -> None:
-        if before == after:
-            return
-        if (
-            before is not None
-            and after is not None
-            and before.name is not None
-            and after.name is not None
-            and before.name == after.name
-        ):
-            return
-
-        logger.debug(f"{before=}")
-        logger.debug(f"{after=}")
-
-        if isinstance(before, Spotify) or isinstance(after, Spotify):
-            return
-
-        before_activity_name: str = _extract_name_from_activity(before)
-        after_activity_name: str = _extract_name_from_activity(after)
-
-        message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
-
-        await _tweet_to_talk_channel(talk_channel, message)
+        await _tweet_to_talk_channel(talk_channel, "\n".join(filter(lambda x: x is not None, message)))
 
     async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState) -> None:
         logger.debug(f"{member=}")
@@ -219,5 +237,8 @@ class InsightsClient(Client):
 
         if before_channel is not None and after_channel is None:
             message = f"{name} lefts Voice Channel at {before_channel.name}"
+
+        if message == "":
+            return
 
         await _tweet_to_talk_channel(talk_channel, message)
