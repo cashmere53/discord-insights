@@ -8,7 +8,6 @@ from discord import (
     Activity,
     ActivityType,
     BaseActivity,
-    Client,
     CustomActivity,
     Game,
     Intents,
@@ -22,6 +21,7 @@ from discord import (
     VoiceChannel,
     VoiceState,
 )
+from discord.ext.commands import Bot
 from loguru import logger
 
 if TYPE_CHECKING:
@@ -180,7 +180,7 @@ def _check_change_voice_status(
     return message
 
 
-class InsightsClient(Client):
+class InsightsClient(Bot):
     def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False, version: str) -> None:
         super().__init__(intents=intents)
         self.talk_channel: str = talk_channel
