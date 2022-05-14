@@ -186,7 +186,7 @@ class InsightsClient(Client):
         if message.content.startswith("$bye"):
             await message.channel.send(f"bye! {message.author}")
 
-    async def on_member_update(self, before: Member, after: Member) -> None:
+    async def on_presence_update(self, before: Member, after: Member) -> None:
         logger.info("someone presences is updated.")
         logger.debug(repr(before))
         logger.debug(repr(after))
