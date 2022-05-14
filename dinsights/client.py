@@ -182,7 +182,7 @@ def _check_change_voice_status(
 
 class InsightsClient(Bot):
     def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False, version: str) -> None:
-        super().__init__(intents=intents)
+        super().__init__("!dis", intents=intents)
         self.talk_channel: str = talk_channel
         self.dev_mode: bool = dev_mode
         self.version = version
