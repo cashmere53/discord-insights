@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from discord import (
     Activity,
@@ -22,8 +22,12 @@ from discord import (
     VoiceChannel,
     VoiceState,
 )
-from discord.abc import GuildChannel
 from loguru import logger
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from discord.abc import GuildChannel
 
 
 def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
