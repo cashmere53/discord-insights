@@ -1,16 +1,15 @@
-FROM python:slim-bullseye
+FROM python:3.10-slim-bullseye
 
 RUN apt update && \
-    apt upgrade -y && \
-    apt install -y git && \
-    pip install git+https://github.com/cashmere53/discord-insights
+    apt upgrade -y
 
 RUN adduser melon
 ENV HOME /home/melon
 WORKDIR ${HOME}
 USER melon
 
-COPY ./token.txt ${HOME}
+COPY . .
+RUN python -m pip install .
 
 EXPOSE 443
 
