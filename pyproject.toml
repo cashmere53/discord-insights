@@ -8,7 +8,7 @@ authors = ["cashmere53 <15913755+cashmere53@users.noreply.github.com>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 loguru = "^0.6.0"
-"discord.py" = "^1.7.3"
+"discord.py" = {git = "https://github.com/Rapptz/discord.py", extras = ["voice"]}
 
 
 [tool.poetry.dev-dependencies]

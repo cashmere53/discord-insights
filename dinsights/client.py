@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from discord import (
     Activity,
@@ -11,7 +11,6 @@ from discord import (
     Client,
     CustomActivity,
     Game,
-    Guild,
     Intents,
     Member,
     Message,
@@ -23,8 +22,12 @@ from discord import (
     VoiceChannel,
     VoiceState,
 )
-from discord.abc import GuildChannel
 from loguru import logger
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    from discord.abc import GuildChannel
 
 
 def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
@@ -38,8 +41,7 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
         Optional[TextChannel]: 指定したチャンネル名のインスタンス
         見つからない場合はNoneを返す
     """
-    member_guild: Guild = member.guild
-    guild_channel: list[GuildChannel] = member_guild.channels
+    guild_channel: list[GuildChannel] = member.guild.channels
     talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
 
     talk_channel: Optional[TextChannel] = None
@@ -78,9 +80,7 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: O
     if len(message) == 0:
         return
 
-    guild: Guild = talk_channel.guild
-
-    logger.info(f'tweets to "{message}" to {talk_channel.name} at {guild.name}')
+    logger.info(f'tweets to "{message}" to {talk_channel.name} at {talk_channel.guild.name}')
     await talk_channel.send(message)
 
 
@@ -99,8 +99,7 @@ def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
         and isinstance(activity, (Activity, Game, Streaming, CustomActivity))
         and activity.name is not None
     ):
-        act_name: str = activity.name
-        activity_name = act_name
+        activity_name = activity.name
 
     return activity_name
 
@@ -149,9 +148,6 @@ def _check_change_activity(
     ):
         return None
 
-    logger.debug(f"{before=}")
-    logger.debug(f"{after=}")
-
     if isinstance(before, Spotify) or isinstance(after, Spotify):
         return None
 
@@ -159,6 +155,28 @@ def _check_change_activity(
     after_activity_name: str = _extract_name_from_activity(after)
 
     message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
+    return message
+
+
+def _check_change_voice_status(
+    name: str,
+    before: VoiceState,
+    after: VoiceState,
+) -> Optional[str]:
+    before_channel: Optional[VoiceChannel | StageChannel] = before.channel
+    after_channel: Optional[VoiceChannel | StageChannel] = after.channel
+
+    message: str = ""
+
+    if before_channel is None and after_channel is not None:
+        message = f"{name} joins Voice Channel at {after_channel.name}"
+
+    if before_channel is not None and after_channel is None:
+        message = f"{name} lefts Voice Channel at {before_channel.name}"
+
+    if message == "":
+        return None
+
     return message
 
 
@@ -188,13 +206,16 @@ class InsightsClient(Client):
         if message.author == self.user:
             return
 
+        if message.author.bot:
+            return
+
         if message.content.startswith("$hello"):
             await message.channel.send("Hello!")
 
         if message.content.startswith("$bye"):
             await message.channel.send(f"bye! {message.author}")
 
-    async def on_member_update(self, before: Member, after: Member) -> None:
+    async def on_presence_update(self, before: Member, after: Member) -> None:
         logger.info("someone presences is updated.")
         logger.debug(repr(before))
         logger.debug(repr(after))
@@ -217,28 +238,6 @@ class InsightsClient(Client):
         logger.debug(f"{after=}")
 
         talk_channel: TextChannel = _find_channel(member, self.talk_channel)
-
-        await self.check_change_voice_status(member.display_name, before, after, talk_channel)
-
-    async def check_change_voice_status(
-        self,
-        name: str,
-        before: VoiceState,
-        after: VoiceState,
-        talk_channel: Optional[TextChannel] = None,
-    ) -> None:
-        before_channel: Optional[VoiceChannel | StageChannel] = before.channel
-        after_channel: Optional[VoiceChannel | StageChannel] = after.channel
-
-        message: str = ""
-
-        if before_channel is None and after_channel is not None:
-            message = f"{name} joins Voice Channel at {after_channel.name}"
-
-        if before_channel is not None and after_channel is None:
-            message = f"{name} lefts Voice Channel at {before_channel.name}"
-
-        if message == "":
-            return
+        message: Optional[str] = _check_change_voice_status(member.display_name, before, after)
 
         await _tweet_to_talk_channel(talk_channel, message)
