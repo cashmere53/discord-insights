@@ -78,9 +78,7 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: O
     if len(message) == 0:
         return
 
-    guild: Guild = talk_channel.guild
-
-    logger.info(f'tweets to "{message}" to {talk_channel.name} at {guild.name}')
+    logger.info(f'tweets to "{message}" to {talk_channel.name} at {talk_channel.guild.name}')
     await talk_channel.send(message)
 
 
@@ -99,8 +97,7 @@ def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
         and isinstance(activity, (Activity, Game, Streaming, CustomActivity))
         and activity.name is not None
     ):
-        act_name: str = activity.name
-        activity_name = act_name
+        activity_name = activity.name
 
     return activity_name
 
@@ -148,9 +145,6 @@ def _check_change_activity(
         and before.name == after.name
     ):
         return None
-
-    logger.debug(f"{before=}")
-    logger.debug(f"{after=}")
 
     if isinstance(before, Spotify) or isinstance(after, Spotify):
         return None
