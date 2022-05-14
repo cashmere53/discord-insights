@@ -14,7 +14,10 @@ class Configs:
 
     @classmethod
     def default(cls) -> Configs:
-        return cls(devmode=False, talk_channel="game-activities")
+        return cls(
+            devmode=False,
+            talk_channel="game-activities",
+        )
 
 
 def configure_from_environments(config: Configs) -> Configs:
