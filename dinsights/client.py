@@ -117,7 +117,7 @@ def _check_change_status(name: str, before: Status, after: Status) -> Optional[s
         Optional[str]: 変更メッセージ Noneは変更なし
     """
     if before == after:
-        return
+        return None
 
     message: str = f"{name} is change status. {before} -> {after}"
 
@@ -139,7 +139,7 @@ def _check_change_activity(
         Optional[str]: 変更メッセージ Noneは変更なし
     """
     if before == after:
-        return
+        return None
     if (
         before is not None
         and after is not None
@@ -147,13 +147,13 @@ def _check_change_activity(
         and after.name is not None
         and before.name == after.name
     ):
-        return
+        return None
 
     logger.debug(f"{before=}")
     logger.debug(f"{after=}")
 
     if isinstance(before, Spotify) or isinstance(after, Spotify):
-        return
+        return None
 
     before_activity_name: str = _extract_name_from_activity(before)
     after_activity_name: str = _extract_name_from_activity(after)
@@ -209,7 +209,7 @@ class InsightsClient(Client):
             _check_change_activity(after.display_name, before.activity, after.activity),
         ]
 
-        await _tweet_to_talk_channel(talk_channel, "\n".join(filter(lambda x: x is not None, message)))
+        await _tweet_to_talk_channel(talk_channel, "\n".join(filter(None, message)))
 
     async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState) -> None:
         logger.debug(f"{member=}")
