@@ -154,6 +154,28 @@ def _check_change_activity(
     return message
 
 
+def _check_change_voice_status(
+    name: str,
+    before: VoiceState,
+    after: VoiceState,
+) -> Optional[str]:
+    before_channel: Optional[VoiceChannel | StageChannel] = before.channel
+    after_channel: Optional[VoiceChannel | StageChannel] = after.channel
+
+    message: str = ""
+
+    if before_channel is None and after_channel is not None:
+        message = f"{name} joins Voice Channel at {after_channel.name}"
+
+    if before_channel is not None and after_channel is None:
+        message = f"{name} lefts Voice Channel at {before_channel.name}"
+
+    if message == "":
+        return None
+
+    return message
+
+
 class InsightsClient(Client):
     def __init__(self, *, intents: Intents, talk_channel: str, dev_mode: bool = False, version: str) -> None:
         super().__init__(intents=intents)
@@ -209,28 +231,6 @@ class InsightsClient(Client):
         logger.debug(f"{after=}")
 
         talk_channel: TextChannel = _find_channel(member, self.talk_channel)
-
-        await self.check_change_voice_status(member.display_name, before, after, talk_channel)
-
-    async def check_change_voice_status(
-        self,
-        name: str,
-        before: VoiceState,
-        after: VoiceState,
-        talk_channel: Optional[TextChannel] = None,
-    ) -> None:
-        before_channel: Optional[VoiceChannel | StageChannel] = before.channel
-        after_channel: Optional[VoiceChannel | StageChannel] = after.channel
-
-        message: str = ""
-
-        if before_channel is None and after_channel is not None:
-            message = f"{name} joins Voice Channel at {after_channel.name}"
-
-        if before_channel is not None and after_channel is None:
-            message = f"{name} lefts Voice Channel at {before_channel.name}"
-
-        if message == "":
-            return
+        message: Optional[str] = _check_change_voice_status(member.display_name, before, after)
 
         await _tweet_to_talk_channel(talk_channel, message)
