@@ -11,7 +11,6 @@ from discord import (
     Client,
     CustomActivity,
     Game,
-    Guild,
     Intents,
     Member,
     Message,
@@ -38,8 +37,7 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
         Optional[TextChannel]: 指定したチャンネル名のインスタンス
         見つからない場合はNoneを返す
     """
-    member_guild: Guild = member.guild
-    guild_channel: list[GuildChannel] = member_guild.channels
+    guild_channel: list[GuildChannel] = member.guild.channels
     talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
 
     talk_channel: Optional[TextChannel] = None
