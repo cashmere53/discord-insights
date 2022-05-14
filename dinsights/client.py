@@ -202,6 +202,9 @@ class InsightsClient(Client):
         if message.author == self.user:
             return
 
+        if message.author.bot:
+            return
+
         if message.content.startswith("$hello"):
             await message.channel.send("Hello!")
 
