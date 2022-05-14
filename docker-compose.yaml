@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       - TZ=Asia/Tokyo
-      - DEVMODE=true
-      - TALK_CHANNEL=bot_dev
+      # - DEVMODE=true
+      # - TALK_CHANNEL=bot_dev
     secrets:
       - token
 
