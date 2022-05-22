@@ -13,5 +13,9 @@
     "python.linting.mypyArgs": [],
     "editor.codeActionsOnSave": {
         "source.organizeImports": true,
-    }
+    },
+    "cSpell.words": [
+        "devmode",
+        "dinsights"
+    ]
 }

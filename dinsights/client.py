@@ -237,6 +237,9 @@ class InsightsClient(Bot):
         logger.debug(f"{before=}")
         logger.debug(f"{after=}")
 
+        if before.afk or after.afk:
+            return
+
         talk_channel: TextChannel = _find_channel(member, self.talk_channel)
         message: Optional[str] = _check_change_voice_status(member.display_name, before, after)
 
