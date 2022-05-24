@@ -30,4 +30,3 @@ def configure_from_environments(config: Configs) -> Configs:
 
 
 configs: Configs = Configs()
-configs = configure_from_environments(configs)
