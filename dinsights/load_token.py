@@ -58,7 +58,7 @@ def load_token(filepath: str | Path) -> str:
     logger.debug(f"load token. {str(filepath)}")
     token: str = filepath.read_text(encoding="utf-8").rstrip("\r\n")
 
-    logger.debug("Success to load token")
+    logger.info("Success to load token")
     return token
 
 
