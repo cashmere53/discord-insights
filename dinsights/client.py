@@ -63,7 +63,14 @@ def _is_joining_in_voice_channel(member: Member) -> bool:
     Returns:
         bool: True=ボイスチャンネルに参加している、False=参加していない
     """
-    return member.voice is not None
+
+    if member.voice is None:
+        return False
+
+    if member.voice.afk:
+        return False
+
+    return True
 
 
 async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: Optional[str]) -> None:
