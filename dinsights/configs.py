@@ -13,6 +13,18 @@ class Configs:
     talk_channel: str = ""
     verbose: int = 0
 
+    @property
+    def log_level(self) -> str:
+        if self.verbose < 0:
+            self.verbose = 0
+
+        if self.verbose == 0:
+            return "INFO"
+        if self.verbose == 1:
+            return "DEBUG"
+
+        return "TRACE"
+
 
 def configure_from_environments(config: Configs) -> Configs:
     devmode: Optional[str] = getenv("DEVMODE")
