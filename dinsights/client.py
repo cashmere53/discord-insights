@@ -208,7 +208,7 @@ class InsightsClient(Bot):
             await self.change_presence(activity=dev_activity)
 
     async def on_message(self, message: Message) -> None:
-        logger.debug(f"{message}, type={type(message)}")
+        logger.debug(message)
 
         if message.author == self.user:
             return
@@ -244,6 +244,7 @@ class InsightsClient(Bot):
         logger.debug(f"{before=}")
         logger.debug(f"{after=}")
 
+        logger.debug(f"check afk: {before.afk=} {after.afk=}")
         if before.afk or after.afk:
             return
 
