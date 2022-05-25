@@ -13,6 +13,9 @@ class Configs:
 
     @property
     def log_level(self) -> str:
+        if self.devmode:
+            return "TRACE"
+
         if self.verbose < 0:
             self.verbose = 0
 
