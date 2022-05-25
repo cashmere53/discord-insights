@@ -63,7 +63,14 @@ def _is_joining_in_voice_channel(member: Member) -> bool:
     Returns:
         bool: True=ボイスチャンネルに参加している、False=参加していない
     """
-    return member.voice is not None
+
+    if member.voice is None:
+        return False
+
+    if member.voice.afk:
+        return False
+
+    return True
 
 
 async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: Optional[str]) -> None:
@@ -201,7 +208,7 @@ class InsightsClient(Bot):
             await self.change_presence(activity=dev_activity)
 
     async def on_message(self, message: Message) -> None:
-        logger.debug(f"{message}, type={type(message)}")
+        logger.debug(message)
 
         if message.author == self.user:
             return
@@ -237,6 +244,7 @@ class InsightsClient(Bot):
         logger.debug(f"{before=}")
         logger.debug(f"{after=}")
 
+        logger.debug(f"check afk: {before.afk=} {after.afk=}")
         if before.afk or after.afk:
             return
 

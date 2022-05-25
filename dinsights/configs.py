@@ -3,33 +3,28 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from os import getenv
-from typing import Optional
 
 
 @dataclass
 class Configs:
-    devmode: bool
-    talk_channel: str
+    devmode: bool = False
+    talk_channel: str = ""
+    verbose: int = 0
 
-    @classmethod
-    def default(cls) -> Configs:
-        return cls(
-            devmode=False,
-            talk_channel="game-activities",
-        )
+    @property
+    def log_level(self) -> str:
+        if self.devmode:
+            return "TRACE"
 
+        if self.verbose < 0:
+            self.verbose = 0
 
-def configure_from_environments(config: Configs) -> Configs:
-    devmode: Optional[str] = getenv("DEVMODE")
-    config.devmode = (devmode is not None) and (devmode.lower() in "yes true 1")
+        if self.verbose == 0:
+            return "INFO"
+        if self.verbose == 1:
+            return "DEBUG"
 
-    talk_channel: Optional[str] = getenv("TALK_CHANNEL")
-    if talk_channel is not None:
-        config.talk_channel = talk_channel
-
-    return config
+        return "TRACE"
 
 
-configs: Configs = Configs.default()
-configs = configure_from_environments(configs)
+configs: Configs = Configs()
