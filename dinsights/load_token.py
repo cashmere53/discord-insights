@@ -13,6 +13,8 @@ LOADING_FILE_ORDER: list[str] = [
     "./token.txt",
 ]
 
+_token: Optional[str] = None
+
 
 def _find_token_file() -> Path:
     """
@@ -62,4 +64,11 @@ def load_token(filepath: str | Path) -> str:
     return token
 
 
-TOKEN: str = load_token(_find_token_file())
+def get_token() -> str:
+    global _token
+
+    if _token is not None:
+        return _token
+
+    _token = load_token(_find_token_file())
+    return _token
