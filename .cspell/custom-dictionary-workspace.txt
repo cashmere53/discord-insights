@@ -1,14 +1,19 @@
 # Custom Dictionary Words
+adduser
 asyncio
 devmode
 dinsights
 filterwarnings
+gecos
+healthcheck
 loguru
 mypy
 poethepoet
 pydantic
 pydocstyle
+pyproject
 pytest
+PYTHONUNBUFFERED
 repr
 testpaths
 tomli
