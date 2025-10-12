@@ -1,0 +1,14 @@
+# Custom Dictionary Words
+asyncio
+devmode
+dinsights
+filterwarnings
+loguru
+mypy
+poethepoet
+pydantic
+pydocstyle
+pytest
+repr
+testpaths
+tomli

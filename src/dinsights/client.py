@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import annotations
-
-from typing import TYPE_CHECKING
 
 from discord import (
     Activity,
@@ -24,14 +20,9 @@ from discord import (
 from discord.ext.commands import Bot
 from loguru import logger
 
-if TYPE_CHECKING:
-    from typing import Optional
 
-    from discord.abc import GuildChannel
-
-
-def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
-    """メンバーインスタンスから指定したチャンネル名のインスタンスを取得する
+def _find_channel(member: Member, channel_name: str) -> TextChannel | None:
+    """メンバーインスタンスから指定したチャンネル名のインスタンスを取得する.
 
     Args:
         member (Member): メンバーインスタンス
@@ -41,10 +32,10 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
         Optional[TextChannel]: 指定したチャンネル名のインスタンス
         見つからない場合はNoneを返す
     """
-    guild_channel: list[GuildChannel] = member.guild.channels
-    talk_channels: list[TextChannel] = list(filter(lambda x: isinstance(x, TextChannel), guild_channel))
+    guild_channels = member.guild.channels
+    talk_channels = [ch for ch in guild_channels if isinstance(ch, TextChannel)]
 
-    talk_channel: Optional[TextChannel] = None
+    talk_channel: TextChannel | None = None
     for channel in talk_channels:
         if str(channel) == channel_name:
             talk_channel = channel
@@ -55,7 +46,7 @@ def _find_channel(member: Member, channel_name: str) -> Optional[TextChannel]:
 
 
 def _is_joining_in_voice_channel(member: Member) -> bool:
-    """メンバーがボイスチャンネルに参加しているか
+    """メンバーがボイスチャンネルに参加しているか.
 
     Args:
         member (Member): ボイスチャンネルに参加しているか確認するメンバーインスタンス
@@ -63,18 +54,14 @@ def _is_joining_in_voice_channel(member: Member) -> bool:
     Returns:
         bool: True=ボイスチャンネルに参加している、False=参加していない
     """
-
     if member.voice is None:
         return False
 
-    if member.voice.afk:
-        return False
-
-    return True
+    return not member.voice.afk
 
 
-async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: Optional[str]) -> None:
-    """指定したTextChannelにメッセージを送信する
+async def _tweet_to_talk_channel(talk_channel: TextChannel | None, message: str | None) -> None:
+    """指定したTextChannelにメッセージを送信する.
 
     Args:
         talk_channel (Optional[TextChannel]): 送信したいTextChannelインスタンス
@@ -91,8 +78,8 @@ async def _tweet_to_talk_channel(talk_channel: Optional[TextChannel], message: O
     await talk_channel.send(message)
 
 
-def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
-    """BaseActivityインスタンスからアクティビティ名を取得する
+def _extract_name_from_activity(activity: BaseActivity | None) -> str:
+    """BaseActivityインスタンスからアクティビティ名を取得する.
 
     Args:
         activity (Optional[BaseActivity]): アクティビティ名を取得したいBaseActivityインスタンス
@@ -111,8 +98,8 @@ def _extract_name_from_activity(activity: Optional[BaseActivity]) -> str:
     return activity_name
 
 
-def _check_change_status(name: str, before: Status, after: Status) -> Optional[str]:
-    """前後のメンバーステータスから変更をチェックする
+def _check_change_status(name: str, before: Status, after: Status) -> str | None:
+    """前後のメンバーステータスから変更をチェックする.
 
     Args:
         name (str): チェックするメンバーの名前
@@ -132,9 +119,9 @@ def _check_change_status(name: str, before: Status, after: Status) -> Optional[s
 
 
 def _check_change_activity(
-    name: str, before: Optional[BaseActivity | Spotify], after: Optional[BaseActivity | Spotify]
-) -> Optional[str]:
-    """前後のメンバーアクティビティから変更をチェックする
+    name: str, before: BaseActivity | Spotify | None, after: BaseActivity | Spotify | None
+) -> str | None:
+    """前後のメンバーアクティビティから変更をチェックする.
 
     Args:
         name (str): チェックするメンバーの名前
@@ -146,22 +133,19 @@ def _check_change_activity(
     """
     if before == after:
         return None
-    if (
-        before is not None
-        and after is not None
-        and before.name is not None
-        and after.name is not None
-        and before.name == after.name
-    ):
-        return None
 
+    # Spotifyは別途処理
     if isinstance(before, Spotify) or isinstance(after, Spotify):
         return None
 
-    before_activity_name: str = _extract_name_from_activity(before)
-    after_activity_name: str = _extract_name_from_activity(after)
+    # BaseActivityの場合、nameがない可能性があるため、_extract_name_from_activityで取得した名前で比較
+    before_name = _extract_name_from_activity(before)
+    after_name = _extract_name_from_activity(after)
 
-    message: str = f"{name} is change activity. {before_activity_name} -> {after_activity_name}"
+    if before_name == after_name:
+        return None
+
+    message: str = f"{name} is change activity. {before_name} -> {after_name}"
     return message
 
 
@@ -169,9 +153,9 @@ def _check_change_voice_status(
     name: str,
     before: VoiceState,
     after: VoiceState,
-) -> Optional[str]:
-    before_channel: Optional[VoiceChannel | StageChannel] = before.channel
-    after_channel: Optional[VoiceChannel | StageChannel] = after.channel
+) -> str | None:
+    before_channel: VoiceChannel | StageChannel | None = before.channel
+    after_channel: VoiceChannel | StageChannel | None = after.channel
 
     message: str = ""
 
@@ -230,9 +214,9 @@ class InsightsClient(Bot):
         if not _is_joining_in_voice_channel(after):
             return
 
-        talk_channel: Optional[TextChannel] = _find_channel(after, self.talk_channel)
+        talk_channel: TextChannel | None = _find_channel(after, self.talk_channel)
 
-        message: list[Optional[str]] = [
+        message: list[str | None] = [
             _check_change_status(after.display_name, before.status, after.status),
             _check_change_activity(after.display_name, before.activity, after.activity),
         ]
@@ -248,7 +232,7 @@ class InsightsClient(Bot):
         if before.afk or after.afk:
             return
 
-        talk_channel: TextChannel = _find_channel(member, self.talk_channel)
-        message: Optional[str] = _check_change_voice_status(member.display_name, before, after)
+        talk_channel = _find_channel(member, self.talk_channel)
+        message: str | None = _check_change_voice_status(member.display_name, before, after)
 
         await _tweet_to_talk_channel(talk_channel, message)

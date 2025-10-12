@@ -1,23 +1,56 @@
 {
-    "editor.formatOnSave": true,
-    "python.formatting.blackPath": ".venv/Scripts/black.exe",
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [],
-    "python.linting.enabled": true,
-    "python.linting.lintOnSave": true,
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": ".venv/Scripts/pflake8.exe",
-    "python.linting.flake8Args": [],
-    "python.linting.mypyEnabled": true,
-    "python.linting.mypyPath": ".venv/Scripts/mypy.exe",
-    "python.linting.mypyArgs": [],
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": true,
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "cSpell.words": [
-        "dataclass",
-        "devmode",
-        "dinsights",
-        "loguru"
-    ]
+    "black-formatter.args": [],
+    "black-formatter.importStrategy": "fromEnvironment",
+    "black-formatter.interpreter": ["${workspaceFolder}/.venv/Scripts/python"],
+    "black-formatter.path": ["${workspaceFolder}/.venv/Scripts/black"],
+    "ruff.importStrategy": "fromEnvironment",
+    "ruff.interpreter": ["${workspaceFolder}/.venv/Scripts/python"],
+    "ruff.path": ["${workspaceFolder}/.venv/Scripts/ruff"],
+    "mypy-type-checker.args": [],
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "mypy-type-checker.interpreter": ["${workspaceFolder}/.venv/Scripts/python"],
+    "mypy-type-checker.path": [
+        "${workspaceFolder}/.venv/Scripts/mypy"
+    ],
+    "ty.importStrategy": "fromEnvironment",
+    "ty.interpreter": ["${workspaceFolder}/.venv/Scripts/python"],
+    "ty.path": ["${workspaceFolder}/.venv/Scripts/ty"],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.pytestPath": "${workspaceFolder}/.venv/Scripts/pytest",
+    "cSpell.customDictionaries": {
+        "custom-dictionary-workspace": {
+            "name": "custom-dictionary-workspace",
+            "path": "${workspaceFolder}/.cspell/custom-dictionary-workspace.txt",
+            "addWords": true,
+            "scope": "workspace"
+        }
+    },
+    "python.analysis.typeCheckingMode": "standard",
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/.pytest_cache": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/*.egg-info": true,
+        "**/.tox": true
+    },
+    "search.exclude": {
+        "**/.venv": true,
+        "**/__pycache__": true,
+        "**/.tox": true
+    }
 }
