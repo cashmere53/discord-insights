@@ -128,5 +128,26 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Ruff
+.ruff_cache/
+
+# uv
+.uv_cache/
+
+# Coverage reports
+htmlcov/
+htmlcov_*/
+.coverage
+.coverage.*
+coverage.xml
+
 # discord token
 token.txt
+
+# IDE settings (uncomment if you want to ignore)
+# .vscode/
+# .idea/
+
+# OS files
+.DS_Store
+Thumbs.db

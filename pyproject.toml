@@ -1,50 +1,131 @@
-[tool.poetry]
+[project]
 name = "dinsights"
-version = "0.4.0"
+version = "0.5.0"
 description = "member activity watcher in Discord"
-authors = ["cashmere53 <15913755+cashmere53@users.noreply.github.com>"]
-
-
-[tool.poetry.dependencies]
-python = "^3.10"
-loguru = "^0.6.0"
-"discord.py" = {git = "https://github.com/Rapptz/discord.py", extras = ["voice"], rev = "master"}
-
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.1"
-black = "^22.1.0"
-isort = "^5.10.1"
-mypy = "^0.942"
-pyproject-flake8 = "^0.0.1-alpha.2"
-flake8-bugbear = "^22.3.23"
-
+readme = "README.md"
+authors = [
+    { name = "cashmere53", email = "15913755+cashmere53@users.noreply.github.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "discord-py[voice]>=2.6.4",
+    "loguru>=0.7.3",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.2,<0.10.0"]
+build-backend = "uv_build"
 
+[dependency-groups]
+dev = [
+    "black>=25.9.0",
+    "mypy>=1.18.2",
+    "pytest>=8.4.2",
+    "pytest-sugar>=1.1.1",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.0",
+    "tox>=4.31.0",
+    "tox-uv>=1.29.0",
+    "ty>=0.0.1a22",
+    "pytest-asyncio>=1.2.0",
+]
+
+[project.scripts]
+nitpick = "nitpick.__main__:main"
 
 [tool.black]
-target-version = ['py310']
+target-version = ["py313"]
 line-length = 120
 
+[tool.ruff]
+line-length = 120
 
-[tool.isort]
-line_length = 120
-multi_line_output = 3
-include_trailing_comma = true
-known_local_folder = ['config', ]
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["T201", "D203", "D212", "ERA001", "D1", "ANN", "COM812", "ISC001"]
+unfixable = ["F401", "F841"]
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
-[tool.flake8]
-max-line-length = 120
-max-complexity = 10
-ignore = "E203,E266,W503,"
-
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S105", "S106"]
 
 [tool.mypy]
-python_version = "3.10"
-no-strict_optional = true
+python_version = "3.13"
+# plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
-check_untyped_defs = true
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# filterwarnings = ["ignore::DeprecationWarning",]
+
+[tool.coverage.xml]
+output = ".pytest_cache/coverage.xml"
+
+[tool.coverage.run]
+branch = true
+source = ["dinsights", "tests"]
+omit = ["tests/fixtures/*"]
+data_file = ".pytest_cache/.coverage"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+]
+
+[tool.tox]
+env_list = ["py310", "py311", "py312", "py313", "py314", "format", "type"]
+
+[tool.tox.env_run_base]
+deps = [
+    ".",
+    "pytest",
+    "pytest-sugar",
+    "pytest-asyncio",
+    "tomli;python_version<'3.11'",
+]
+commands = [["pytest", "."]]
+
+[tool.tox.env.py310]
+base_python = ["python3.10"]
+
+[tool.tox.env.py311]
+base_python = ["python3.11"]
+
+[tool.tox.env.py312]
+base_python = ["python3.12"]
+
+[tool.tox.env.py313]
+base_python = ["python3.13"]
+
+[tool.tox.env.py314]
+base_python = ["python3.14"]
+
+[tool.tox.env.format]
+deps = [
+    ".",
+    "black",
+]
+commands = [["black", "--check", "."]]
+
+[tool.tox.env.type]
+deps = [
+    ".",
+    "mypy",
+    "ruff",
+    "ty",
+]
+commands = [
+    ["mypy", "src/dinsights"],
+    ["ruff", "check", "src/dinsights"],
+    ["ty", "check", "src/dinsights"],
+]

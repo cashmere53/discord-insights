@@ -1,12 +1,64 @@
+# Version control
 .git/
-.mypy_cache/
-.venv/
-.vscode/
-dist/
-tests/
-.dockerignore
-.editorconfig
 .gitignore
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.tox/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Development tools
+.vscode/
+.idea/
+.editorconfig
+.cspell/
+
+# Test files and coverage
+tests/
+htmlcov/
+htmlcov_*/
+.coverage
+.coverage.*
+coverage.xml
+
+# Build artifacts
+dist/
+build/
+*.egg
+*.whl
+
+# Docker files
+.dockerignore
 docker-compose.yml
+docker-compose.yaml
 Dockerfile
+
+# Lock files (include uv.lock for reproducible builds, exclude others)
+# uv.lock is kept for dependency locking
+
+# Sensitive files
 token.txt
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+LICENSE
+
+# UV cache
+.uv_cache/
+
+# Project config (might want to include pyproject.toml)
+# pyproject.toml is typically needed for installation

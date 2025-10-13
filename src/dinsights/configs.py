@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -16,12 +14,12 @@ class Configs:
         if self.devmode:
             return "TRACE"
 
-        if self.verbose < 0:
-            self.verbose = 0
+        # verboseの値を正規化 - 副作用なし
+        normalized_verbose = max(self.verbose, 0)
 
-        if self.verbose == 0:
+        if normalized_verbose == 0:
             return "INFO"
-        if self.verbose == 1:
+        if normalized_verbose == 1:
             return "DEBUG"
 
         return "TRACE"

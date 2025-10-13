@@ -1,0 +1,47 @@
+services:
+  dinsights:
+    container_name: dinsights-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+      labels:
+        - "com.discord-insights.version=0.5.0"
+        - "com.discord-insights.description=Discord activity monitoring bot"
+    image: discord-insights:0.5.0
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Tokyo
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    secrets:
+      - token
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "/home/melon/healthcheck.sh"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - discord-net
+
+networks:
+  discord-net:
+    driver: bridge
+    name: discord-insights-network
+
+secrets:
+  token:
+    file: ./token.txt
