@@ -53,9 +53,11 @@ token.txt
 .DS_Store
 Thumbs.db
 
-# Documentation
-*.md
+# Documentation (exclude most, but keep README.md for build)
 LICENSE
+docs/
+*.md
+!README.md
 
 # UV cache
 .uv_cache/

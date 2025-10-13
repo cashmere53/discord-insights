@@ -9,6 +9,7 @@ services:
         - "com.discord-insights.description=Discord activity monitoring bot"
     image: discord-insights:0.5.0
     restart: unless-stopped
+    command: ["uv", "run", "--frozen", "python", "-m", "dinsights", "--dev", "--talk-channel", "game-activities"]
     environment:
       - TZ=Asia/Tokyo
       - PYTHONUNBUFFERED=1

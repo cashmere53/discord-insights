@@ -22,7 +22,7 @@ WORKDIR ${HOME}
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # 依存関係定義ファイルをコピー（キャッシュ効率化）
-COPY --chown=melon:melon pyproject.toml uv.lock ./
+COPY --chown=melon:melon pyproject.toml uv.lock README.md ./
 
 # ユーザー切り替え
 USER melon
